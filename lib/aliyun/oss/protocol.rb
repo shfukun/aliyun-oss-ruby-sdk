@@ -1019,13 +1019,14 @@ module Aliyun
         copy_result
       end
 
-      def processing_persistence(bucket_name, src_object_name, opts = {})
-        logger.debug("Begin processing persistence object, bucket: #{bucket_name}, "\
+      def processing_persistence(bucket_name, src_object_name, source_with_precess, opts = {})
+        puts("Begin processing persistence object, bucket: #{bucket_name}, "\
                      "source object: #{src_object_name}, source with precess: "\
-                     "#{1}, options: #{opts}")
+                     "#{source_with_precess}, options: #{opts}")
 
         headers = {
-          'content-type' => opts[:content_type]
+          'content-type' => opts[:content_type],
+          :query => source_with_precess
         }
         (opts[:metas] || {})
           .each { |k, v| headers["x-oss-meta-#{k.to_s}"] = v.to_s }
