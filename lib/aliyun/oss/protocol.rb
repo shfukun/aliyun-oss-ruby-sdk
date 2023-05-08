@@ -1019,12 +1019,17 @@ module Aliyun
         copy_result
       end
 
-      def process_object(bucket_name, src_object_name, precess, opts = {})
+      def process_object(bucket_name, src_object_name, precess, policy_string, sign, opts = {})
         puts("Begin processing persistence object, bucket: #{bucket_name}, "\
                      "source object: #{src_object_name}, with precess: "\
                      "#{precess}, options: #{opts}")
         body = "x-oss-process=#{precess}"
-        headers = { 'content-type' => opts[:content_type], 'content-length' => body.size }
+
+        headers = {
+          'content-type' => opts[:content_type],
+          'content-length' => body.size,
+          'policy' => policy_string,
+          'Signature' => sign}
         r = @http.post(
           {:bucket => bucket_name, :object => src_object_name},
           {:headers => headers, query: {'x-oss-process': nil}, body: body})
