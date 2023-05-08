@@ -406,6 +406,12 @@ module Aliyun
         @protocol.copy_object(name, source, dest, args)
       end
 
+      def processing_persistence(source, dest, ope)
+        args = { }
+        args[:content_type] ||= get_content_type(dest)
+        @protocol.processing_persistence(name, source, source_with_precess(source, dest, ope), args)
+      end
+
       # 删除一个object
       # @param key [String] Object的名字
       def delete_object(key)
@@ -630,7 +636,7 @@ module Aliyun
             'date' => expires.to_s,
           }
 
-          #query 
+          #query
           if @protocol.get_sts_token
             query['security-token'] = @protocol.get_sts_token
           end
@@ -644,7 +650,7 @@ module Aliyun
           query['Expires'] = expires.to_s
           query['OSSAccessKeyId'] = @protocol.get_access_key_id
           query['Signature'] = signature
-        end  
+        end
 
         query_string = query.map { |k, v| v ? [k, CGI.escape(v)].join("=") : k }.join("&")
         link_char = query_string.empty? ? '' : '?'
@@ -691,6 +697,11 @@ module Aliyun
       # @return [String] the checkpoint file path
       def get_cpt_file(file)
         "#{File.expand_path(file)}.cpt"
+      end
+
+      # image/resize,w_100|sys/saveas,o_dGVzdC5qcGc,b_dGVzdA
+      def source_with_precess(source, dest, ope)
+        "#{source}?x-oss-process=#{ope}|sys/saveas,o_#{Base64.strict_encode64(dest)}"
       end
     end # Bucket
   end # OSS

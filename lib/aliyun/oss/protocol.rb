@@ -1019,6 +1019,44 @@ module Aliyun
         copy_result
       end
 
+      def processing_persistence(bucket_name, src_object_name, source_with_precess, opts = {})
+        logger.debug("Begin processing persistence object, bucket: #{bucket_name}, "\
+                     "source object: #{src_object_name}, source with precess: "\
+                     "#{source_with_precess}, options: #{opts}")
+
+        src_bucket = opts[:src_bucket] || bucket_name
+        headers = {
+          'x-oss-copy-source' =>
+            @http.get_resource_path(src_bucket, src_object_name),
+          'content-type' => opts[:content_type],
+          'query' => source_with_precess
+        }
+        (opts[:metas] || {})
+          .each { |k, v| headers["x-oss-meta-#{k.to_s}"] = v.to_s }
+
+        {
+          :acl => 'x-oss-object-acl',
+          :meta_directive => 'x-oss-metadata-directive'
+        }.each { |k, v| headers[v] = opts[k] if opts[k] }
+
+        headers.merge!(get_copy_conditions(opts[:condition])) if opts[:condition]
+
+        r = @http.post(
+          {:bucket => bucket_name, :object => src_object_name},
+          {:headers => headers})
+
+        doc = parse_xml(r.body)
+        post_result = {
+          :last_modified => get_node_text(
+            doc.root, 'LastModified') { |x| Time.parse(x) },
+          :etag => get_node_text(doc.root, 'ETag')
+        }.reject { |_, v| v.nil? }
+
+        logger.debug("Done post object")
+
+        post_result
+      end
+
       # Delete an object from the bucket
       # @param bucket_name [String] the bucket name
       # @param object_name [String] the object name
@@ -1511,7 +1549,7 @@ module Aliyun
       # @return [String] the access key secret
       def get_access_key_secret
         @config.access_key_secret
-      end  
+      end
 
       # Get user's STS token
       # @return [String] the STS token
