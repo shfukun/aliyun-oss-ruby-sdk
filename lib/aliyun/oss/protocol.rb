@@ -1031,7 +1031,7 @@ module Aliyun
           }
         r = @http.post(
           {:bucket => bucket_name, :object => src_object_name, :sub_res => {'x-oss-process' => nil}},
-          {:headers => headers, query: {'x-oss-process': nil}, body: body})
+          {:headers => headers, body: body})
 
         doc = parse_xml(r.body)
         post_result = {
