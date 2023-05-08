@@ -1023,11 +1023,11 @@ module Aliyun
         puts("Begin processing persistence object, bucket: #{bucket_name}, "\
                      "source object: #{src_object_name}, with precess: "\
                      "#{precess}, options: #{opts}")
-
-        headers = { 'content-type' => opts[:content_type] }
+        body = "x-oss-process=#{precess}"
+        headers = { 'content-type' => opts[:content_type], 'content-length' => body.size }
         r = @http.post(
           {:bucket => bucket_name, :object => src_object_name},
-          {:headers => headers, query: {'x-oss-process': nil}, body: "x-oss-process=#{precess}"})
+          {:headers => headers, query: {'x-oss-process': nil}, body: body})
 
         doc = parse_xml(r.body)
         post_result = {
