@@ -406,10 +406,10 @@ module Aliyun
         @protocol.copy_object(name, source, dest, args)
       end
 
-      def processing_persistence(source, dest, ope)
+      def process_object(source, dest, ope)
         args = { }
         args[:content_type] ||= get_content_type(dest)
-        @protocol.processing_persistence(name, source, source_with_precess(dest, ope), args)
+        @protocol.process_object(name, source, with_precess(dest, ope), args)
       end
 
       # 删除一个object
@@ -700,9 +700,8 @@ module Aliyun
       end
 
       # image/resize,w_100|sys/saveas,o_dGVzdC5qcGc,b_dGVzdA
-      def source_with_precess(dest, ope)
-        # "#{source}?x-oss-process=#{ope}|sys/saveas,o_#{Base64.strict_encode64(dest)}"
-        {'x-oss-process' => "#{ope}|sys/saveas,o_#{Base64.strict_encode64(dest)}"}
+      def with_precess(dest, ope)
+        "#{ope}|sys/saveas,o_#{Base64.strict_encode64(dest)}"
       end
     end # Bucket
   end # OSS

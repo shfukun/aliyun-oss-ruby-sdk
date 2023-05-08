@@ -1019,14 +1019,13 @@ module Aliyun
         copy_result
       end
 
-      def processing_persistence(bucket_name, src_object_name, source_with_precess, opts = {})
+      def process_object(bucket_name, src_object_name, precess, opts = {})
         puts("Begin processing persistence object, bucket: #{bucket_name}, "\
-                     "source object: #{src_object_name}, source with precess: "\
-                     "#{source_with_precess}, options: #{opts}")
+                     "source object: #{src_object_name}, with precess: "\
+                     "#{precess}, options: #{opts}")
 
         headers = {
-          'content-type' => opts[:content_type],
-          :query => source_with_precess
+          'content-type' => opts[:content_type]
         }
         (opts[:metas] || {})
           .each { |k, v| headers["x-oss-meta-#{k.to_s}"] = v.to_s }
@@ -1035,12 +1034,9 @@ module Aliyun
           :acl => 'x-oss-object-acl',
           :meta_directive => 'x-oss-metadata-directive'
         }.each { |k, v| headers[v] = opts[k] if opts[k] }
-
-        headers.merge!(get_copy_conditions(opts[:condition])) if opts[:condition]
-
         r = @http.post(
           {:bucket => bucket_name, :object => src_object_name},
-          {:headers => headers})
+          {:headers => headers, body: "x-oss-process=#{precess}"})
 
         doc = parse_xml(r.body)
         post_result = {
