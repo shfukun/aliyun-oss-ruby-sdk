@@ -1024,19 +1024,10 @@ module Aliyun
                      "source object: #{src_object_name}, with precess: "\
                      "#{precess}, options: #{opts}")
 
-        headers = {
-          'content-type' => opts[:content_type]
-        }
-        (opts[:metas] || {})
-          .each { |k, v| headers["x-oss-meta-#{k.to_s}"] = v.to_s }
-
-        {
-          :acl => 'x-oss-object-acl',
-          :meta_directive => 'x-oss-metadata-directive'
-        }.each { |k, v| headers[v] = opts[k] if opts[k] }
+        headers = { 'content-type' => opts[:content_type] }
         r = @http.post(
           {:bucket => bucket_name, :object => src_object_name},
-          {:headers => headers, body: "x-oss-process=#{precess}"})
+          {:headers => headers, query: {'x-oss-process': nil}, body: "x-oss-process=#{precess}"})
 
         doc = parse_xml(r.body)
         post_result = {
