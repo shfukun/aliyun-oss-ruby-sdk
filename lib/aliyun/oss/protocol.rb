@@ -1026,8 +1026,6 @@ module Aliyun
 
         src_bucket = opts[:src_bucket] || bucket_name
         headers = {
-          'x-oss-copy-source' =>
-            @http.get_resource_path(src_bucket, src_object_name),
           'content-type' => opts[:content_type],
           'query' => source_with_precess
         }
