@@ -410,7 +410,7 @@ module Aliyun
         args = { }
         args[:content_type] ||= get_content_type(dest)
         policy = {
-          'expiration' => (Time.now + expiry).utc.iso8601.sub('Z', '.000Z'),
+          'expiration' => (Time.now + 60.seconds).utc.iso8601.sub('Z', '.000Z'),
           'conditions' => [{'bucket' => bucket_name}]
         }
         policy_string = Base64.strict_encode64(policy.to_json)
