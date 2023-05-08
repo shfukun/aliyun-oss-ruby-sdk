@@ -1024,10 +1024,9 @@ module Aliyun
                      "source object: #{src_object_name}, source with precess: "\
                      "#{source_with_precess}, options: #{opts}")
 
-        src_bucket = opts[:src_bucket] || bucket_name
         headers = {
           'content-type' => opts[:content_type],
-          'query' => source_with_precess
+          :query => source_with_precess
         }
         (opts[:metas] || {})
           .each { |k, v| headers["x-oss-meta-#{k.to_s}"] = v.to_s }
